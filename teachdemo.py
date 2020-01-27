@@ -15,7 +15,7 @@ demos = ["demosin"]
 class DemoLister:
     def __init__(self, master, path="."):
         self.master = master
-        self.listbox = ttk.Listbox(master)
+        self.listbox = tk.Listbox(master)
         self.demo_list = []
         for idx, demo in enumerate(demos):
             demo_modules.append(importlib.import_module(demo))
