@@ -18,6 +18,7 @@ class Demo:
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+
     plt.ion()
     d = Demo(plt.figure())
     d.interact(3)

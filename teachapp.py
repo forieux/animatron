@@ -1,19 +1,17 @@
-import sys
-import inspect
-from inspect import signature
 import importlib
+import inspect
 import numbers
-from pathlib import Path
-
+import sys
 import tkinter as tk
 import tkinter.ttk as ttk
+from inspect import signature
+from pathlib import Path
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
-
 from logzero import logger
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-sys.path.append('./demos')
+sys.path.append("./demos")
 
 
 class TeachApp:
@@ -35,6 +33,12 @@ class TeachApp:
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
+        reloadButton = ttk.Button(self.master, text="Reload", command=self.reload)
+        reloadButton.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.labelAuthor = ttk.Label(self.master, text="")
+        self.labelAuthor.pack(side=tk.LEFT, padx=5, pady=5)
+
         closeButton = ttk.Button(self.master, text="Close", command=self.master.quit)
         closeButton.pack(side=tk.RIGHT, padx=5, pady=5)
 
@@ -55,6 +59,7 @@ class TeachApp:
             self.update()
             self.fig.canvas.draw_idle()
             self.fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+            self.labelAuthor["text"] = demo.comment
         else:
             self._demo = None
 
@@ -63,20 +68,50 @@ class TeachApp:
         self.demo_obj.interact(*args)
         self.fig.canvas.draw_idle()
 
+    def reload(self):
+        self.dtree.reload()
+
     def resize(self, event):
         self.fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+        self.fig.canvas.draw_idle()
 
 
 class DemoWrap:
-    def __init__(self, name, app: TeachApp):
+    def __init__(self, name, app: TeachApp) -> None:
         self.app = app
         self.name = name
-        self.code = importlib.import_module(name)
-        self.title = self.code.title
-        self.nparam = len(signature(self.code.Demo.interact).parameters) - 1
+        self.runable = False
+        self.load()
+
+    def load(self):
+        try:
+            self.code = importlib.import_module(self.name)
+            importlib.reload(self.code)
+        except Exception as e:
+            logger.error(f"Error while trying to import {self.name}.py")
+            logger.error(e)
+            self.title = f"{self.name} (ERROR)"
+            self.runable = False
+            self.comment = ""
+        else:
+            self.title = self.code.title
+            self.nparam = len(signature(self.code.Demo.interact).parameters) - 1
+            if hasattr(self.code, "authors"):
+                if hasattr(self.code, "email"):
+                    self.comment = f"{self.code.authors} - {self.code.email}"
+                else:
+                    self.comment = f"{self.code.authors}"
+            elif hasattr(self.code, "email"):
+                self.comment = f"{self.code.email}"
+            else:
+                self.comment = ""
+
+            if hasattr(self.code, "dontload") and self.code.dontload:
+                self.runable = False
+            else:
+                self.runable = True
 
     def add_control(self, app: TeachApp):
-        self.param_names = []
         self.controls = []
         # self.par_annots = []
         parameters = signature(self.code.Demo.interact).parameters
@@ -88,59 +123,50 @@ class DemoWrap:
             else:
                 default = parameters[key].default
 
-            if isinstance(annot, tuple):
-                if len(annot) == 1 and isinstance(annot[0], int):
+            if isinstance(annot, tuple) and len(annot) == 2:
+                if all(isinstance(a, int) for a in annot):
+                    control = IntScale(
+                        app, start=annot[0], stop=annot[1], name=name, default=default,
+                    )
+                elif all(isinstance(a, numbers.Real) for a in annot):
+                    control = FloatScale(
+                        app, start=annot[0], stop=annot[1], name=name, default=default,
+                    )
+                else:
+                    logger.warning(f"{annot} annotations control type unsuported")
                     control = None
-                elif len(annot) == 1 and isinstance(annot[0], float):
-                    control = None
-                elif len(annot) == 2:
-                    if all(isinstance(a, int) for a in annot):
-                        logger.info("2 IntSlider")
-                        control = IntSlider(
-                            app,
-                            start=annot[0],
-                            stop=annot[1],
-                            name=name,
-                            default=default,
-                        )
-                    elif all(isinstance(a, numbers.Real) for a in annot):
-                        logger.info("2 FloatSlider")
-                        control = FloatSlider(
-                            app,
-                            start=annot[0],
-                            stop=annot[1],
-                            name=name,
-                            default=default,
-                        )
-                    else:
-                        logger.warning(f"{annot} annotations control type unsuported")
-                        control = None
-                elif len(annot) == 3:
-                    if all(isinstance(a, numbers.Real) for a in annot):
-                        logger.info("3 FloatSlider")
-                        control = FloatSlider(
-                            app,
-                            start=annot[0],
-                            stop=annot[1],
-                            num=annot[2],
-                            name=name,
-                            default=default,
-                        )
-            elif isinstance(annot, numbers.Real):
-                control = None
+            elif isinstance(annot, tuple) and len(annot) == 3:
+                if all(isinstance(a, numbers.Real) for a in annot):
+                    control = FloatScale(
+                        app,
+                        start=annot[0],
+                        stop=annot[1],
+                        num=annot[2],
+                        name=name,
+                        default=default,
+                    )
+            elif isinstance(annot, tuple):
+                control = Dropdown(app, values=annot)
+            elif isinstance(annot, str):
+                control = Button(app, annot)
+            elif isinstance(annot, bool):
+                control = CheckBox(app, name, annot)
+            elif isinstance(annot, range):
+                control = Slider(app, len(annot))
             else:
-                logger.warning(f"{annot} annotations control type unsuported")
-                control = None
+                logger.warning(
+                    f"{annot} annotations control type unsuported and will be given as fixed default value"
+                )
+                control = Fixed(annot)
 
             if control is not None:
                 self.controls.append(control)
 
 
-class IntSlider:
+class IntScale:
     def __init__(
         self, app: TeachApp, start: int, stop: int, name: str = "", default: int = None,
     ) -> None:
-        logger.info("Init IntSlider")
         self.app = app
 
         w = tk.Scale(
@@ -150,6 +176,7 @@ class IntSlider:
             orient=tk.HORIZONTAL,
             command=self.update,
             label=name,
+            length=150,
         )
         w.pack(side=tk.LEFT, padx=5, pady=5)
         if default is None:
@@ -164,7 +191,7 @@ class IntSlider:
         self.app.update()
 
 
-class FloatSlider:
+class FloatScale:
     def __init__(
         self,
         app: TeachApp,
@@ -174,7 +201,6 @@ class FloatSlider:
         name: str = "",
         default: float = None,
     ) -> None:
-        logger.info("Init FloatSlider")
         self.app = app
 
         w = tk.Scale(
@@ -185,6 +211,7 @@ class FloatSlider:
             orient=tk.HORIZONTAL,
             command=self.update,
             label=name,
+            length=150,
         )
         w.pack(side=tk.LEFT, padx=5, pady=5)
         if default is None:
@@ -200,46 +227,124 @@ class FloatSlider:
 
 
 class Button:
-    pass
+    def __init__(self, app: TeachApp, text: str,) -> None:
+        self.app = app
+        self.val = None
+
+        w = ttk.Button(app.control_frame, text=text, command=self.update,)
+        w.pack(side=tk.LEFT, padx=5, pady=5)
+
+    def update(self):
+        self.val = True
+        self.app.update()
+        self.val = None
 
 
-class ReloadButton:
-    pass
+class Slider:
+    def __init__(self, app: TeachApp, num: int,) -> None:
+        self.app = app
+        self.num = num
+        self.val = 0
+
+        self.label = ttk.Label(app.control_frame, text=f"0 / {num-1}")
+        self.label.pack(side=tk.LEFT, padx=5, pady=5)
+        w = ttk.Button(app.control_frame, text="←", command=self.previous,)
+        w.pack(side=tk.LEFT, padx=5, pady=5)
+        w = ttk.Button(app.control_frame, text="→", command=self.next,)
+        w.pack(side=tk.LEFT, padx=5, pady=5)
+
+    def previous(self):
+        self.val = max(self.val - 1, 0)
+        self.label["text"] = f"{self.val} / {self.num-1}"
+        self.app.update()
+
+    def next(self):
+        self.val = min(self.val + 1, self.num - 1)
+        self.label["text"] = f"{self.val} / {self.num-1}"
+        self.app.update()
 
 
 class CheckBox:
-    pass
+    def __init__(self, app, text, value):
+        self.app = app
+        self.val = value
+        self.text = text
+        self.val = value
+        self.var = tk.IntVar()
+
+        if self.val:
+            self.var.set(1)
+        else:
+            self.var.set(0)
+
+        w = ttk.Checkbutton(
+            app.control_frame, text=text, command=self.update, variable=self.var,
+        )
+        w.pack(side=tk.LEFT, padx=5, pady=5)
+
+    def update(self):
+        if self.var.get():
+            self.val = True
+        else:
+            self.val = False
+        self.app.update()
 
 
 class Dropdown:
-    pass
+    def __init__(self, app, values):
+        self.app = app
+        self.values = values
+        self._idx = 0
+        self.val = values[self._idx]
+
+        w = ttk.Combobox(app, values=[str(item) for item in values])
+        w.current(self._idx + 1)
+        w.pack(side=tk.LEFT, padx=5, pady=5)
+        w.bind("<<ComboboxSelected>>", self.update)
+
+    def update(self, event):
+        pass
 
 
-class Text:
-    pass
+class Fixed:
+    def __init__(self, val):
+        self.val = val
 
 
 class DemosTree:
-    def __init__(self, app: TeachApp, path="."):
+    def __init__(self, app: TeachApp, path=".") -> None:
         self.app = app
-        demo_names = (p.stem for p in Path('./demos').glob('*.py'))
-        self.demos = [DemoWrap(name, app) for name in demo_names]
+        demo_names = (p.stem for p in Path("./demos").rglob("*.py"))
+        self.demos = []
+        for name in sorted(demo_names):
+            self.demos.append(DemoWrap(name, app))
 
-        tree = ttk.Treeview(app.master)
-        tree.heading("#0", text="Demos", anchor=tk.W)
-        tree.column("#0", width=250)
+        self.tree = ttk.Treeview(app.master)
+        self.tree.heading("#0", text="Demos", anchor=tk.W)
+        self.tree.column("#0", width=250)
         for demo in self.demos:
-            tree.insert("", tk.END, demo.name, text=demo.title)
+            self.tree.insert("", tk.END, demo.name, text=demo.title)
 
-        tree.pack(side=tk.LEFT, fill=tk.BOTH)
+        self.tree.pack(side=tk.LEFT, fill=tk.BOTH)
 
-        tree.bind("<<TreeviewSelect>>", self.on_select)
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
 
     def on_select(self, event):
-        selected = event.widget.selection()[0]
+        self.selected = event.widget.selection()[0]
         for demo in self.demos:
-            if demo.name == selected:
+            if demo.name == self.selected and demo.runable:
                 break
+        else:
+            demo = None
+        self.app.demo = demo
+
+    def reload(self):
+        for demo in self.demos:
+            if demo.name == self.selected:
+                demo.load()
+                if demo.runable:
+                    self.tree.item(demo.name, text=demo.title)
+                    break
         else:
             demo = None
         self.app.demo = demo
