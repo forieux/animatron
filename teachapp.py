@@ -19,7 +19,6 @@ class TeachApp:
         self.master = master
         self.demo = None
 
-        self.master.title("Illustrations")
         self.style = ttk.Style()
         self.style.theme_use("clam")
 
@@ -43,6 +42,12 @@ class TeachApp:
         closeButton.pack(side=tk.RIGHT, padx=5, pady=5)
 
         self.master.bind("<Configure>", self.resize)
+
+        self.fs_state = False
+        self.master.bind("<F11>", self.toggle_fullscreen)
+        self.master.bind("<Escape>", self.end_fullscreen)
+
+        self.master.bind("b", self.create_black_window)
 
     @property
     def demo(self):
@@ -74,6 +79,19 @@ class TeachApp:
     def resize(self, event):
         self.fig.tight_layout(rect=[0, 0.03, 1, 0.95])
         self.fig.canvas.draw_idle()
+
+    def toggle_fullscreen(self, event=None):
+        self.fs_state = not self.fs_state  # Just toggling the boolean
+        self.master.attributes("-fullscreen", self.fs_state)
+        return "break"
+
+    def end_fullscreen(self, event=None):
+        self.fs_state = False
+        self.master.attributes("-fullscreen", False)
+        return "break"
+
+    def create_black_window(self, event=None):
+        FullscreenBlackWindow(self.master)
 
 
 class DemoWrap:
@@ -314,16 +332,53 @@ class Fixed:
 class DemosTree:
     def __init__(self, app: TeachApp, path=".") -> None:
         self.app = app
-        demo_names = (p.stem for p in Path("./demos").rglob("*.py"))
-        self.demos = []
-        for name in sorted(demo_names):
-            self.demos.append(DemoWrap(name, app))
+        # for path in Path("./demos").rglob("*.py"):
+        #     if len(path.parts) > 2:
+        # demo_names = (p.stem for p in Path("./demos").rglob("*.py"))
+        # self.demos = []
+        # for name in sorted(demo_names):
+        #     self.demos.append(DemoWrap(name, app))
+
+        tree = [(Path("./demos"), [])]
+        for path in sorted(tree[0][0].iterdir()):
+            if path.is_file() and path.suffix == ".py":
+                tree[0][1].append(path)
+            elif path.is_dir():
+                tree.append((path, []))
+                for pathb in path.iterdir():
+                    if pathb.is_file() and pathb.suffix == ".py":
+                        tree[-1][1].append(pathb)
+        # Remove __pycache__
+        tree = [t for t in tree if len(t[1]) != 0]
 
         self.tree = ttk.Treeview(app.master)
         self.tree.heading("#0", text="Demos", anchor=tk.W)
         self.tree.column("#0", width=250)
-        for demo in self.demos:
+
+        self.demos = []
+        for demopath in tree[0][1]:
+            demo = DemoWrap(demopath.stem, app)
+            self.demos.append(demo)
             self.tree.insert("", tk.END, demo.name, text=demo.title)
+
+        for subtree in tree[1:]:
+            sys.path.append(str(subtree[0]))
+            iid = self.tree.insert(
+                "",
+                tk.END,
+                subtree[0].name,
+                text=subtree[0].name,
+                open=True,
+                tags=("folder",),
+            )
+            for demopath in subtree[1]:
+                demo = DemoWrap(demopath.stem, app)
+                self.demos.append(demo)
+                self.tree.insert(iid, tk.END, demo.name, text=demo.title)
+        self.tree.tag_configure("folder", font=("TkDefaultFont", 10, "bold",))
+
+        # for demo in self.demos:
+        #     self.tree.insert("", tk.END, demo.name, text=demo.title)
 
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH)
 
@@ -348,6 +403,24 @@ class DemosTree:
         else:
             demo = None
         self.app.demo = demo
+
+
+class FullscreenBlackWindow:
+    def __init__(self, master):
+        self.win = tk.Toplevel(master)
+        s = ttk.Style()
+        s.configure("black.TFrame", background="black")
+        self.frame = ttk.Frame(self.win, style="black.TFrame")
+        self.frame.pack(fill=tk.BOTH, expand=True)
+
+        self.win.attributes("-fullscreen", True)
+
+        self.win.config(cursor="none")
+
+        self.win.bind("b", self.close)
+
+    def close(self, event):
+        self.win.destroy()
 
 
 def main():
