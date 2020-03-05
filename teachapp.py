@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import numbers
+import os
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -8,8 +9,14 @@ from inspect import signature
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import matplotlib.style as mplstyle
 from logzero import logger
+from matplotlib import rcParams as mplrc
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+mplstyle.use(["seaborn", "fast"])
+mplrc["image.cmap"] = "gray"
+# mplrc["text.usetex"] = True
 
 sys.path.append("./demos")
 
@@ -48,6 +55,9 @@ class TeachApp:
         self.master.bind("<Escape>", self.end_fullscreen)
 
         self.master.bind("b", self.create_black_window)
+
+        logger.info("Screensaver suspended")
+        os.system("xdg-screensaver suspend " + str(hex(master.winfo_id())))
 
     @property
     def demo(self):
@@ -356,12 +366,15 @@ class DemosTree:
         self.tree.column("#0", width=250)
 
         self.demos = []
-        for demopath in tree[0][1]:
+        for demopath in sorted(tree[0][1]):
             demo = DemoWrap(demopath.stem, app)
             self.demos.append(demo)
-            self.tree.insert("", tk.END, demo.name, text=demo.title)
+            if demo.runable:
+                self.tree.insert("", tk.END, demo.name, text=demo.title)
+            else:
+                self.tree.insert("", tk.END, demo.name, text=demo.title, tags=("notr"))
 
-        for subtree in tree[1:]:
+        for subtree in sorted(tree[1:]):
             sys.path.append(str(subtree[0]))
             iid = self.tree.insert(
                 "",
@@ -371,11 +384,17 @@ class DemosTree:
                 open=True,
                 tags=("folder",),
             )
-            for demopath in subtree[1]:
+            for demopath in sorted(subtree[1]):
                 demo = DemoWrap(demopath.stem, app)
                 self.demos.append(demo)
-                self.tree.insert(iid, tk.END, demo.name, text=demo.title)
+                if demo.runable:
+                    self.tree.insert(iid, tk.END, demo.name, text=demo.title)
+                else:
+                    self.tree.insert(
+                        "", tk.END, demo.name, text=demo.title, tags=("notr")
+                    )
         self.tree.tag_configure("folder", font=("TkDefaultFont", 10, "bold",))
+        self.tree.tag_configure("notr", font=("TkDefaultFont", 10, "italic",))
 
         # for demo in self.demos:
         #     self.tree.insert("", tk.END, demo.name, text=demo.title)
@@ -425,6 +444,7 @@ class FullscreenBlackWindow:
 
 def main():
     root = tk.Tk()
+    root.title("TeachApp")
     root.protocol("WM_DELETE_WINDOW", lambda: root.quit())
     TeachApp(master=root)
     root.mainloop()
