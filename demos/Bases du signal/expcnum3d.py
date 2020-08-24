@@ -9,18 +9,22 @@ email = "orieux@l2s.centralesupelec.fr"
 
 def expc(n, m=1.03, φ=0.2):
     z = m * np.exp(1j * φ)
-    return z**n
+    return z ** n
 
 
 class Demo:
     def __init__(self, fig):
         fig.clf()
 
-        self.n = np.arange(-50, 50)
+        self.n = np.arange(-30, 30)
         self.axe = fig.add_subplot(111, projection="3d", proj_type="ortho")
         res = expc(self.n)
-        (self.line,) = self.axe.plot(self.n, np.real(res), np.imag(res), color="C0", alpha=0.5)
-        (self.marker,) = self.axe.plot(self.n, np.real(res), np.imag(res), "o", color="C0")
+        (self.line,) = self.axe.plot(
+            self.n, np.real(res), np.imag(res), color="C0", alpha=0.4
+        )
+        (self.marker,) = self.axe.plot(
+            self.n, np.real(res), np.imag(res), "o", color="C0"
+        )
         self.axe.set_ylim([-5, 5])
         self.axe.set_zlim([-5, 5])
         # self.axe.grid("on")
@@ -35,7 +39,7 @@ class Demo:
 
     def interact(
         self,
-        m: (0.98, 1.02, 20) = 1,
+        m: (0.95, 1.05, 20) = 1,
         φ: (-0.5, 0.5, 10) = 0.2,
         pr: "Im." = None,
         pi: "Re." = None,

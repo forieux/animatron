@@ -1,14 +1,16 @@
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
+assert Axes3D
+
 title = "Exponentielle complexe 3D"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
 
 
-def expc(t, r=0.2, ω=5):
+def expc(t, A=1, r=0.2, ω=5):
     p = r + 1j * ω
-    return np.exp(2 * np.pi * p * t)
+    return A * np.exp(2 * np.pi * p * t)
 
 
 class Demo:
@@ -24,18 +26,20 @@ class Demo:
         self.axe.set_zlabel(r"$Im[e^{pt}]$")
 
         self.axe.set_title(
-            r"L'exponentielle complexe $e^{pt} = e^{rt}e^{iωt} = e^{rt} (cos(ωt) + sin(ω t))$, $p = r + i ω$",
+            r"L'exponentielle complexe $e^{pt} = e^{rt}e^{iωt} = "
+            r"e^{rt} (cos(ωt) + sin(ω t))$, $p = r + i ω$",
         )
 
     def interact(
         self,
+        A: (0, 2, 10) = 1,
         r: (-0.3, 0.3, 10) = 0.2,
         ω: (-10.0, 10.0, 10) = 5,
         pr: "Im." = None,
         pi: "Re." = None,
         pt: "Proj. t" = None,
     ):
-        res = expc(self.t, r=r, ω=ω)
+        res = expc(self.t, A=A, r=r, ω=ω)
         self.line.set_data_3d(self.t, np.real(res), np.imag(res))
 
         if pr:

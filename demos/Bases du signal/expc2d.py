@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-title = "Exponentielle complexe"
+title = "Laplace"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
 
 
-def expc(t, r=0.2, ω=5):
-    p = r + 1j * ω
+def expc(t, σ=0.2, ω=5):
+    p = σ + 1j * ω
     return np.exp(2 * np.pi * p * t)
 
 
@@ -25,9 +25,9 @@ class Demo:
         axes[0, 0].grid("on")
         axes[0, 0].set_xlim(-0.35, 0.35)
         axes[0, 0].set_ylim(-11, 11)
-        axes[0, 0].set_title("p")
-        axes[0, 0].set_xlabel("Re[p]")
-        axes[0, 0].set_ylabel("Im[p]")
+        axes[0, 0].set_title("p = σ + iω")
+        axes[0, 0].set_xlabel("σ = Re[p]")
+        axes[0, 0].set_ylabel("ω = Im[p]")
 
         (self.lr,) = axes[0, 1].plot(self.t, np.real(res))
         axes[0, 1].set_xlabel("t")
@@ -43,7 +43,7 @@ class Demo:
 
         (self.la,) = axes[1, 1].plot(self.t, np.abs(res))
         axes[1, 1].set_xlabel("t")
-        axes[1, 1].set_title("$|e^{pt}| = e^{rt}$")
+        axes[1, 1].set_title("$|e^{pt}| = e^{σt}$")
         axes[1, 1].set_ylim([-3.5, 3.5])
         axes[1, 1].grid("on")
 
@@ -54,15 +54,15 @@ class Demo:
         axes[1, 2].grid("on")
 
         plt.suptitle(
-            r"L'exponentielle complexe $e^{pt} = e^{rt}e^{iωt} = e^{rt} (cos(ωt) + sin(ω t))$, $p = r + i ω$",
+            r"L'exponentielle complexe $e^{pt} = e^{σt} \times e^{iωt} = e^{σt} \times [cos(ωt) + sin(ω t)]$, avec $p = σ + i ω$",
         )
 
-    def interact(self, r: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
+    def interact(self, σ: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
         res = expc(self.t, r=r, ω=ω)
 
-        self.pt.set_xdata(r)
+        self.pt.set_xdata(σ)
         self.pt.set_ydata(ω)
-        self.rayon.set_xdata([0, r])
+        self.rayon.set_xdata([0, σ])
         self.rayon.set_ydata([0, ω])
         self.lr.set_ydata(np.real(res))
         self.li.set_ydata(np.imag(res))
