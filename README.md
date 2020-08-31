@@ -17,7 +17,7 @@ The objectives are
 
 ![demo.gif](demo.gif "Demo")
 
-Looks the =demos= directory.
+Looks the `demos` directory.
 
 # Installation
 
