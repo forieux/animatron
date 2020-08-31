@@ -1,19 +1,21 @@
 # About
 
 This is the repository of a small application I made to teach with simple
-interactive demonstration.
+interactive demonstrations.
 
-The objective are
+The objectives are
 
 - Simple API.
 
-- Automatic creation of control.
+- Automatic creation of GUI control.
 
-- No specific knowledge to create new demonstration except python itself.
+- No specific knowledge to create a new demonstration except python itself.
 
-- Authors is fully in charge of the demonstration.
+- Author is fully in charge of the demonstration code.
 
-- Presentation in classroom.
+- Presentation in the classroom.
+
+![demo.gif](demo.gif "Demo")
 
 Looks the =demos= directory.
 
@@ -30,7 +32,18 @@ After that you just have to launch it with `poetry run python3 teachapp.py`
 
 # Authors
 
-If you want to contribute, email me.
+If you want to contribute, email me. If you use it, please cite me I, and link
+to that page.
 
-I'm François Orieux (http://pro.orieux.fr), an assistant professor at
+I'm François Orieux (http://pro.orieux.fr), an assistant professor,
 Paris-Saclay University, in Laboratoire des Signaux et Systèmes.
+
+# TODO
+
+- Clean codebase and repository.
+
+Long term
+
+- win and osx support
+- octave or matlab support
+- web frontend (based on jupyter I suppose)
