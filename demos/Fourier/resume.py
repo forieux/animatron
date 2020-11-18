@@ -4,6 +4,7 @@ from matplotlib.ticker import MaxNLocator
 title = "Résumé"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
+dontload = True
 
 
 class Demo:

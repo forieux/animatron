@@ -38,6 +38,10 @@ to that page.
 I'm François Orieux (http://pro.orieux.fr), an assistant professor,
 Paris-Saclay University, in Laboratoire des Signaux et Systèmes.
 
+# Copyright
+
+Music : That Crooner from Nowhere - The Hudsucker is lost
+
 # TODO
 
 - Clean codebase and repository.

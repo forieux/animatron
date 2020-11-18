@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-title = "Laplace"
+title = "Exponentielle complexe 2D"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
 
@@ -58,7 +58,7 @@ class Demo:
         )
 
     def interact(self, σ: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
-        res = expc(self.t, r=r, ω=ω)
+        res = expc(self.t, σ=σ, ω=ω)
 
         self.pt.set_xdata(σ)
         self.pt.set_ydata(ω)

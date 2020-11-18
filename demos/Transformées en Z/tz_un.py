@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 title = "TZ échelon"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
-dontload = False
+dontload = True
 
 limits = (-2, 2, -2, 2)
 
@@ -51,5 +51,4 @@ if __name__ == "__main__":
     fig = plt.figure(1)
     plt.clf()
     d = Demo(fig)
-    # d.interact(3)
-    plt.show()
+    lt.show()
