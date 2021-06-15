@@ -20,7 +20,7 @@ class Demo:
         self.axe = fig.add_subplot(111, projection="3d", proj_type="ortho")
         res = expc(self.n)
         (self.line,) = self.axe.plot(
-            self.n, np.real(res), np.imag(res), color="C0", alpha=0.4
+            self.n, np.real(res), np.imag(res), color="C0", alpha=0.3
         )
         (self.marker,) = self.axe.plot(
             self.n, np.real(res), np.imag(res), "o", color="C0"
@@ -29,18 +29,18 @@ class Demo:
         self.axe.set_zlim([-5, 5])
         # self.axe.grid("on")
 
-        # self.axe.set_xlabel("t")
-        # self.axe.set_ylabel(r"$Re[e^{pt}]$")
-        # self.axe.set_zlabel(r"$Im[e^{pt}]$")
+        self.axe.set_xlabel("n", labelpad=30)
+        self.axe.set_ylabel(r"$Re[z^{n}]$", labelpad=30)
+        self.axe.set_zlabel(r"$Im[z^{n}]$", labelpad=30)
 
-        # self.axe.set_title(
-        #     r"L'exponentielle complexe $e^{pt} = e^{rt}e^{iφt} = e^{rt} (cos(φt) + sin(φ t))$, $p = r + i φ$",
-        # )
+        self.axe.set_title(
+            r"L'exponentielle complexe $z^{n} = |z|^{n}e^{ι φ n} = |z|^{n} × [cos(φn) + ι sin(φ n)]$,  avec  $z = |z| e^{ι φ}$",
+        )
 
     def interact(
         self,
-        m: (0.95, 1.05, 20) = 1,
-        φ: (-0.5, 0.5, 10) = 0.2,
+        m: (0.95, 1.05, 20) = 1.03,
+        φ: (-1, 1, 30) = 0.5,
         pr: "Im." = None,
         pi: "Re." = None,
         pt: "Proj. t" = None,

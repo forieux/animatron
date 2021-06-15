@@ -21,13 +21,13 @@ class Demo:
         res = expc(self.t)
         (self.line,) = self.axe.plot(self.t, np.real(res), np.imag(res))
 
-        self.axe.set_xlabel("t")
-        self.axe.set_ylabel(r"$Re[e^{pt}]$")
-        self.axe.set_zlabel(r"$Im[e^{pt}]$")
+        self.axe.set_xlabel("t", labelpad=30)
+        self.axe.set_ylabel(r"$Re[e^{pt}]$", labelpad=30)
+        self.axe.set_zlabel(r"$Im[e^{pt}]$", labelpad=30)
 
         self.axe.set_title(
-            r"L'exponentielle complexe $e^{pt} = e^{rt}e^{iωt} = "
-            r"e^{rt} (cos(ωt) + sin(ω t))$, $p = r + i ω$",
+            r"L'exponentielle complexe $e^{pt} = e^{σt}e^{ιωt} = "
+            r"e^{σt} × [cos(ωt) + ι sin(ω t)]$, $p = σ + ι ω$",
         )
 
     def interact(

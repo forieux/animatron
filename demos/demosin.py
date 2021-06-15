@@ -1,6 +1,6 @@
 import numpy as np
 
-title = "Sinus"
+title = "Example: sinus"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
 
@@ -14,6 +14,9 @@ class Demo:
 
     def interact(self, freq: (1, 5)):
         self.line.set_ydata(np.sin(2 * freq * np.pi * self.time))
+
+    def unload(self):
+        print("Unload demo")
 
 
 if __name__ == "__main__":

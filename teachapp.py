@@ -14,8 +14,19 @@ from logzero import logger
 from matplotlib import rcParams as mplrc
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 mplstyle.use(["seaborn", "fast"])
 mplrc["image.cmap"] = "gray"
+mplrc["font.size"] = "18"
+mplrc["axes.titlesize"] = "large"
+mplrc["axes.labelsize"] = "large"
+mplrc["legend.fontsize"] = "large"
+
+plt.rc("xtick", labelsize="large")
+plt.rc("ytick", labelsize="large")
+
+# mplrc["font.size"] = 22
+
 # mplrc["text.usetex"] = True
 
 sys.path.append("./demos")
@@ -24,7 +35,7 @@ sys.path.append("./demos")
 class TeachApp:
     def __init__(self, master):
         self.master = master
-        self.demo = None
+        self._demo = None
 
         self.style = ttk.Style()
         self.style.theme_use("clam")
@@ -55,6 +66,7 @@ class TeachApp:
         self.master.bind("<Escape>", self.end_fullscreen)
 
         self.master.bind("b", self.create_black_window)
+        self.master.bind("q", self.quit)
 
         logger.info("Screensaver suspended")
         os.system("xdg-screensaver suspend " + str(hex(master.winfo_id())))
@@ -65,6 +77,9 @@ class TeachApp:
 
     @demo.setter
     def demo(self, demo):
+        if hasattr(self, "demo_obj") and hasattr(self.demo_obj, "unload"):
+            self.demo_obj.unload()
+
         if demo is not None:
             self._demo = demo
             for child in self.control_frame.winfo_children():
@@ -73,7 +88,7 @@ class TeachApp:
             self.demo_obj = self._demo.code.Demo(self.fig)
             self.update()
             self.fig.canvas.draw_idle()
-            self.fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+            self.fig.tight_layout(rect=[0, 0.01, 1, 0.99])
             self.labelAuthor["text"] = demo.comment
         else:
             self._demo = None
@@ -103,6 +118,9 @@ class TeachApp:
     def create_black_window(self, event=None):
         FullscreenBlackWindow(self.master)
 
+    def quit(self, event=None):
+        self.master.quit()
+
 
 class DemoWrap:
     def __init__(self, name, app: TeachApp) -> None:
@@ -112,6 +130,7 @@ class DemoWrap:
         self.load()
 
     def load(self):
+        logger.info(f"Importing {self.name}")
         try:
             self.code = importlib.import_module(self.name)
             importlib.reload(self.code)
@@ -154,11 +173,19 @@ class DemoWrap:
             if isinstance(annot, tuple) and len(annot) == 2:
                 if all(isinstance(a, int) for a in annot):
                     control = IntScale(
-                        app, start=annot[0], stop=annot[1], name=name, default=default,
+                        app,
+                        start=annot[0],
+                        stop=annot[1],
+                        name=name,
+                        default=default,
                     )
                 elif all(isinstance(a, numbers.Real) for a in annot):
                     control = FloatScale(
-                        app, start=annot[0], stop=annot[1], name=name, default=default,
+                        app,
+                        start=annot[0],
+                        stop=annot[1],
+                        name=name,
+                        default=default,
                     )
                 else:
                     logger.warning(f"{annot} annotations control type unsuported")
@@ -193,7 +220,12 @@ class DemoWrap:
 
 class IntScale:
     def __init__(
-        self, app: TeachApp, start: int, stop: int, name: str = "", default: int = None,
+        self,
+        app: TeachApp,
+        start: int,
+        stop: int,
+        name: str = "",
+        default: int = None,
     ) -> None:
         self.app = app
 
@@ -255,11 +287,19 @@ class FloatScale:
 
 
 class Button:
-    def __init__(self, app: TeachApp, text: str,) -> None:
+    def __init__(
+        self,
+        app: TeachApp,
+        text: str,
+    ) -> None:
         self.app = app
         self.val = None
 
-        w = ttk.Button(app.control_frame, text=text, command=self.update,)
+        w = ttk.Button(
+            app.control_frame,
+            text=text,
+            command=self.update,
+        )
         w.pack(side=tk.LEFT, padx=5, pady=5)
 
     def update(self):
@@ -269,16 +309,28 @@ class Button:
 
 
 class Slider:
-    def __init__(self, app: TeachApp, num: int,) -> None:
+    def __init__(
+        self,
+        app: TeachApp,
+        num: int,
+    ) -> None:
         self.app = app
         self.num = num
         self.val = 0
 
         self.label = ttk.Label(app.control_frame, text=f"0 / {num-1}")
         self.label.pack(side=tk.LEFT, padx=5, pady=5)
-        w = ttk.Button(app.control_frame, text="←", command=self.previous,)
+        w = ttk.Button(
+            app.control_frame,
+            text="←",
+            command=self.previous,
+        )
         w.pack(side=tk.LEFT, padx=5, pady=5)
-        w = ttk.Button(app.control_frame, text="→", command=self.next,)
+        w = ttk.Button(
+            app.control_frame,
+            text="→",
+            command=self.next,
+        )
         w.pack(side=tk.LEFT, padx=5, pady=5)
 
     def previous(self):
@@ -306,7 +358,10 @@ class CheckBox:
             self.var.set(0)
 
         w = ttk.Checkbutton(
-            app.control_frame, text=text, command=self.update, variable=self.var,
+            app.control_frame,
+            text=text,
+            command=self.update,
+            variable=self.var,
         )
         w.pack(side=tk.LEFT, padx=5, pady=5)
 
@@ -393,8 +448,22 @@ class DemosTree:
                     self.tree.insert(
                         "", tk.END, demo.name, text=demo.title, tags=("notr")
                     )
-        self.tree.tag_configure("folder", font=("TkDefaultFont", 10, "bold",))
-        self.tree.tag_configure("notr", font=("TkDefaultFont", 10, "italic",))
+        self.tree.tag_configure(
+            "folder",
+            font=(
+                "TkDefaultFont",
+                10,
+                "bold",
+            ),
+        )
+        self.tree.tag_configure(
+            "notr",
+            font=(
+                "TkDefaultFont",
+                10,
+                "italic",
+            ),
+        )
 
         # for demo in self.demos:
         #     self.tree.insert("", tk.END, demo.name, text=demo.title)

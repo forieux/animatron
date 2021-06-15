@@ -36,7 +36,7 @@ class Demo:
             r"$e(t) = sin(ω t)$    /    $s(t) = e * h = A(ω) sin(ω t + \phi(ω))$"
         )
 
-    def interact(self, ω: (10, 40)):
+    def interact(self, ω: (5, 60)):
         sig = np.sin(ω * self.t)
         self.le.set_ydata(sig)
         self.ls.set_ydata(np.convolve(sig, self.h, "full")[: len(sig)])

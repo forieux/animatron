@@ -51,3 +51,19 @@ Long term
 - win and osx support
 - octave or matlab support
 - web frontend (based on jupyter I suppose)
+
+# Planned animatin
+
+- continous convolution
+- discrete convolution
+- convolution of image
+- Fourier synthesis (1D, 2D)
+- Fourier properties animation
+- Live spectrum
+- C Order 1 system (LP, HP, BP)
+- C Order 2 system
+- C Order N system
+- N Order 1 system
+- N Order 2 system
+- N Order N system
+

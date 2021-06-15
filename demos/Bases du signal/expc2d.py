@@ -25,7 +25,7 @@ class Demo:
         axes[0, 0].grid("on")
         axes[0, 0].set_xlim(-0.35, 0.35)
         axes[0, 0].set_ylim(-11, 11)
-        axes[0, 0].set_title("p = σ + iω")
+        axes[0, 0].set_title("p = σ + ιω")
         axes[0, 0].set_xlabel("σ = Re[p]")
         axes[0, 0].set_ylabel("ω = Im[p]")
 
@@ -54,7 +54,7 @@ class Demo:
         axes[1, 2].grid("on")
 
         plt.suptitle(
-            r"L'exponentielle complexe $e^{pt} = e^{σt} \times e^{iωt} = e^{σt} \times [cos(ωt) + sin(ω t)]$, avec $p = σ + i ω$",
+            r"L'exponentielle complexe $e^{pt} = e^{σt} \times e^{ιωt} = e^{σt} \times [cos(ωt) + ι sin(ω t)]$, avec $p = σ + ι ω$",
         )
 
     def interact(self, σ: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
