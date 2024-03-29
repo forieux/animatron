@@ -56,6 +56,7 @@ class Demo:
         plt.suptitle(
             r"L'exponentielle complexe $e^{pt} = e^{σt} \times e^{ιωt} = e^{σt} \times [cos(ωt) + ι sin(ω t)]$, avec $p = σ + ι ω$",
         )
+        plt.tight_layout()
 
     def interact(self, σ: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
         res = expc(self.t, σ=σ, ω=ω)

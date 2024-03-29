@@ -16,7 +16,10 @@ class Demo:
         self.t = np.linspace(-2, 5, 1000)
         self.σ = np.linspace(limits[0], limits[1], 200)
         self.ω = np.linspace(limits[2], limits[3], 200)
-        self.Σ, self.Ω = np.meshgrid(self.σ, self.ω,)
+        self.Σ, self.Ω = np.meshgrid(
+            self.σ,
+            self.ω,
+        )
         self.P = self.Σ + 1j * self.Ω
         self.u = np.where(self.t < 0, 0, 1)
 
@@ -73,7 +76,7 @@ class Demo:
         # self.axes[1, 2].grid(False)
         # self.axes[1, 2].axvline(0, color="red", alpha=0.7)
 
-        plt.suptitle(r"Exponentielle $e^{αt}$")
+        plt.suptitle(r"Exponentielle causale $e^{αt}$")
 
     def sig(self, α=-0.1):
         return self.u * np.exp(α * self.t)
@@ -97,7 +100,10 @@ class Demo:
             return np.full_like(self.ω, np.nan)
 
     def interact(
-        self, α: (-1, 1, 20) = -0.2, σ: (-1, 1, 20) = 0.2, ω: (-7, 7, 20) = 5,
+        self,
+        α: (-1, 1, 20) = -0.2,
+        σ: (-1, 1, 20) = 0.2,
+        ω: (-7, 7, 20) = 5,
     ):
         res = self.prod(α=α, σ=σ, ω=ω)
 
@@ -117,6 +123,8 @@ class Demo:
         self.axes[0, 2].set_ylim([-2, 2])
 
         self.ima.set_data(np.log(np.abs(self.tl(α))))
+        # self.ima.relim()
+        # self.ima.autoscale_view()  # enable=True, axis="Y")
 
         # self.imf.set_data(np.angle(self.tl(α)))
 

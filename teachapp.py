@@ -14,10 +14,9 @@ from logzero import logger
 from matplotlib import rcParams as mplrc
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-
-mplstyle.use(["seaborn", "fast"])
+mplstyle.use(["tableau-colorblind10", "fast"])
 mplrc["image.cmap"] = "gray"
-mplrc["font.size"] = "18"
+mplrc["font.size"] = "14"
 mplrc["axes.titlesize"] = "large"
 mplrc["axes.labelsize"] = "large"
 mplrc["legend.fontsize"] = "large"
@@ -153,7 +152,7 @@ class DemoWrap:
             else:
                 self.comment = ""
 
-            if hasattr(self.code, "dontload") and self.code.dontload:
+            if hasattr(self.code, "load") and not self.code.load:
                 self.runable = False
             else:
                 self.runable = True

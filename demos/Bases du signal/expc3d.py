@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -17,6 +18,7 @@ class Demo:
     def __init__(self, fig):
         fig.clf()
         self.t = np.linspace(-1, 1, 1000)
+        # self.axe = fig.add_subplot(111, projection="3d", proj_type="ortho")
         self.axe = fig.add_subplot(111, projection="3d", proj_type="ortho")
         res = expc(self.t)
         (self.line,) = self.axe.plot(self.t, np.real(res), np.imag(res))
@@ -29,17 +31,22 @@ class Demo:
             r"L'exponentielle complexe $e^{pt} = e^{σt}e^{ιωt} = "
             r"e^{σt} × [cos(ωt) + ι sin(ω t)]$, $p = σ + ι ω$",
         )
+        # self.axe.set_aspect("auto")
+        # self.axe.set_box_aspect(
+        #     [ub - lb for lb, ub in (getattr(self.axe, f"get_{a}lim")() for a in "xyz")]
+        # )
+        # plt.tight_layout()
 
     def interact(
         self,
         A: (0, 2, 10) = 1,
-        r: (-0.3, 0.3, 10) = 0.2,
+        σ: (-0.3, 0.3, 10) = 0.2,
         ω: (-10.0, 10.0, 10) = 5,
         pr: "Im." = None,
         pi: "Re." = None,
         pt: "Proj. t" = None,
     ):
-        res = expc(self.t, A=A, r=r, ω=ω)
+        res = expc(self.t, A=A, r=σ, ω=ω)
         self.line.set_data_3d(self.t, np.real(res), np.imag(res))
 
         if pr:

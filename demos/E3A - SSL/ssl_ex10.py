@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-title = "Ex. 07"
+title = "Ex. 10"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
 
@@ -71,7 +71,9 @@ class Demo:
         return ω, z * np.sin(ω0 * Te) / (z ** 2 - 2 * z * np.cos(ω0 * Te) + 1)
 
     def interact(
-        self, ω0: (1, 20, 19) = 1, Te: (0.05, 0.15, 20) = 0.1,
+        self,
+        ω0: (1, 20, 19) = 1,
+        Te: (0.05, 0.15, 20) = 0.1,
     ):
         self.im.set_data(np.log(np.abs(self.tz(ω0, Te))))
 

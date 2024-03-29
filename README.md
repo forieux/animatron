@@ -1,19 +1,27 @@
+# Last News 2024-03-29
+
+I recently got some support from my institution to continue the development of
+this software and try to make it more usable to others. Therefore I'm currently
+working on
+
+1. separation of the software with demo
+2. made a standalone binary that can be downloaded and launched for the three major platforms.
+
+Stay tuned.
+
 # About
 
 This is the repository of a small application I made to teach with simple
-interactive demonstrations.
+interactive demonstrations or interactive figures.
 
 The objectives are
 
-- Simple API.
-
+- Simple or no API.
 - Automatic creation of GUI control.
-
-- No specific knowledge to create a new demonstration except python itself.
-
+- No specific knowledge to create figure except python itself.
 - Author is fully in charge of the demonstration code.
-
 - Presentation in the classroom.
+- Offline.
 
 ![demo.gif](demo.gif "Demo")
 
