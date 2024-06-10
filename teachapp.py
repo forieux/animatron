@@ -13,6 +13,7 @@ import matplotlib.style as mplstyle
 from logzero import logger
 from matplotlib import rcParams as mplrc
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from wakepy import keep
 
 mplstyle.use(["tableau-colorblind10", "fast"])
 mplrc["image.cmap"] = "gray"
@@ -66,9 +67,6 @@ class TeachApp:
 
         self.master.bind("b", self.create_black_window)
         self.master.bind("q", self.quit)
-
-        logger.info("Screensaver suspended")
-        os.system("xdg-screensaver suspend " + str(hex(master.winfo_id())))
 
     @property
     def demo(self):
@@ -511,11 +509,12 @@ class FullscreenBlackWindow:
 
 
 def main():
-    root = tk.Tk()
-    root.title("TeachApp")
-    root.protocol("WM_DELETE_WINDOW", lambda: root.quit())
-    TeachApp(master=root)
-    root.mainloop()
+    with keep.presenting():
+        root = tk.Tk()
+        root.title("TeachApp")
+        root.protocol("WM_DELETE_WINDOW", lambda: root.quit())
+        TeachApp(master=root)
+        root.mainloop()
 
 
 if __name__ == "__main__":

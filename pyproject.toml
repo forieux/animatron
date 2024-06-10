@@ -12,6 +12,7 @@ logzero = "^1.5.0"
 sounddevice = "^0.3.14"
 soundfile = "^0.10.3"
 nuitka = "^2.0.1"
+wakepy = "^0.9.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
