@@ -8,6 +8,7 @@ import tkinter.ttk as ttk
 from inspect import signature
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
 from logzero import logger
@@ -15,12 +16,16 @@ from matplotlib import rcParams as mplrc
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from wakepy import keep
 
+# https://matplotlib.org/stable/users/explain/artists/performance.html
 mplstyle.use(["tableau-colorblind10", "fast"])
+mpl.rcParams["path.simplify_threshold"] = 1  # default 1/9, can try 0.5
+
 mplrc["image.cmap"] = "gray"
 mplrc["font.size"] = "14"
 mplrc["axes.titlesize"] = "large"
 mplrc["axes.labelsize"] = "large"
 mplrc["legend.fontsize"] = "large"
+
 
 plt.rc("xtick", labelsize="large")
 plt.rc("ytick", labelsize="large")
@@ -497,8 +502,6 @@ class FullscreenBlackWindow:
         s.configure("black.TFrame", background="black")
         self.frame = ttk.Frame(self.win, style="black.TFrame")
         self.frame.pack(fill=tk.BOTH, expand=True)
-
-        self.win.attributes("-fullscreen", True)
 
         self.win.config(cursor="none")
 

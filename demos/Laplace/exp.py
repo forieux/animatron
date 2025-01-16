@@ -130,9 +130,9 @@ class Demo:
 
         self.lf.set_ydata(np.abs(self.tf(α)))
 
-        self.red1.set_xdata(σ)
-        self.red1.set_ydata(ω)
-        self.red2.set_xdata(ω)
+        self.red1.set_xdata([σ])
+        self.red1.set_ydata([ω])
+        self.red2.set_xdata([ω])
         # self.red2.set_xdata(σ)
         # self.red2.set_ydata(ω)
 

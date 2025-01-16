@@ -61,8 +61,8 @@ class Demo:
     def interact(self, σ: (-0.3, 0.3, 10) = 0.2, ω: (-10.0, 10.0, 10) = 5):
         res = expc(self.t, σ=σ, ω=ω)
 
-        self.pt.set_xdata(σ)
-        self.pt.set_ydata(ω)
+        self.pt.set_xdata([σ])
+        self.pt.set_ydata([ω])
         self.rayon.set_xdata([0, σ])
         self.rayon.set_ydata([0, ω])
         self.lr.set_ydata(np.real(res))

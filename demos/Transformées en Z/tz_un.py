@@ -5,7 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 title = "TZ échelon"
 authors = "F. Orieux"
 email = "orieux@l2s.centralesupelec.fr"
-dontload = True
+# dontload = True
+load = False
 
 limits = (-2, 2, -2, 2)
 
@@ -38,7 +39,7 @@ class Demo:
         return np.where(self.n < 0, 0, 1)
 
     def tz(self):
-        out = 1 / (1 - self.Z ** -1)
+        out = 1 / (1 - self.Z**-1)
         out[np.abs(self.Z) <= 1] = np.nan
         return out
 

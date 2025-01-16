@@ -110,9 +110,9 @@ class Demo:
         self.axes[0, 1].set_xlabel("t")
         self.axes[0, 1].set_title(r"$Im[u() e^{-pt}]$")
 
-        self.red1.set_xdata(σ)
-        self.red1.set_ydata(ω)
-        self.red2.set_xdata(ω)
+        self.red1.set_xdata([σ])
+        self.red1.set_ydata([ω])
+        self.red2.set_xdata([ω])
         # self.red2.set_ydata(ω)
 
         # self.lr.set_ydata(np.real(res))
